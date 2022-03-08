@@ -1,5 +1,5 @@
 # DevOps Automation_Project
-#Task 2
+#Task 2 & 3
 
 This is Automation project for Upgrad DevOps PGDSD
 
