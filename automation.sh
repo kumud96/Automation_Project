@@ -26,15 +26,33 @@ else
 	sudo systemctl enable apache2
 fi
 
-echo "Compressing logs and storing into /tmp"
+echo "Compressing the logs and storing it into /tmp"
 
 cd /var/log/apache2/
 
 tar -cvf /tmp/${myname}-httpd-logs-${timestamp}.tar *.log
 
-echo "Copying logs to s3"
+echo "Copying  the logs to s3"
 
 aws s3 \
 cp /tmp/${myname}-httpd-logs-${timestamp}.tar \
 s3://${s3_bucket}/${myname}-httpd-logs-${timestamp}.tar
 
+if [ -e /var/www/html/inventory.html ]
+then
+        echo "Inventory does exists"
+else
+        touch /var/www/html/inventory.html
+        echo "<b>Log Type &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date Created &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Type &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Size</b>" >> /var/www/html/inventory.html
+fi
+
+echo "<br>httpd-logs &nbsp;&nbsp;&nbsp;&nbsp; ${timestamp} &nbsp;&nbsp;&nbsp;&nbsp; tar &nbsp;&nbsp;&nbsp;&nbsp; `du -h /tmp/${myname}-httpd-logs-${timestamp}.tar | awk '{print $1}'`" >> /var/www/html/inventory.html
+
+if [ -e /etc/cron.d/automation ]
+then
+        echo "Cron job exists"
+else
+        touch /etc/cron.d/automation
+        echo "0 0 * * * root /root/Automation_Project/automation.sh" > /etc/cron.d/automation
+        echo "Cron job added"
+fi
